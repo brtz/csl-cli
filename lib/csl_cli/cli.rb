@@ -95,9 +95,14 @@ module CslCli
       request = CslCli::Request::Get.new(app_url + "/switches/" + query, headers)
       if request.code < 400
         response = request.response
-        if options[:format] == 'csv'
+
+        case options[:format]
+        when "csv"
           tp.set :separator, ","
           tp.set :max_width, 100000
+        when "json"
+          puts response.to_json
+          exit
         end
 
         if options[:show_all]
