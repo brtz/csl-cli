@@ -9,7 +9,7 @@ module CslCli
 
     def initialize(path)
       @path = path
-      @configfile = File.join(@path, '.csl_config')
+      @configfile = File.join(@path, '.csl_config.json')
     end
 
     def load

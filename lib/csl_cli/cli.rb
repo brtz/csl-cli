@@ -13,15 +13,16 @@ module CslCli
       config = configloader.load
 
       if config != false
-        puts "Loaded config from .csv_config"
+        puts "Loaded config from .csv_config.json"
         email = config['email']
         password = config['password']
         app_url = config['app_url']
+      else
+        puts "Loaded config from ENV"
+        email = ENV['CSL_CLI_EMAIL']
+        password = ENV['CSL_CLI_PASSWORD']
+        app_url = ENV['CSL_CLI_APP_URL']
       end
-
-      email = ENV['CSL_CLI_EMAIL']
-      password = ENV['CSL_CLI_PASSWORD']
-      app_url = ENV['CSL_CLI_APP_URL']
 
       abort 'email missing, please check environment variables' if email.nil?
       abort 'password missing, please check environment variables' if password.nil?
@@ -52,7 +53,14 @@ module CslCli
       token = nil
       decoded_token = {}
 
-      app_url = ENV['CSL_CLI_APP_URL']
+      configloader = CslCli::Config.new(ENV['HOME'])
+      config = configloader.load
+
+      if config != false
+        app_url = config['app_url']
+      else
+        app_url = ENV['CSL_CLI_APP_URL']
+      end
 
       abort 'app_url missing, please check environment variables' if app_url.nil?
 
@@ -85,7 +93,14 @@ module CslCli
       decoded_token = {}
       query = ""
 
-      app_url = ENV['CSL_CLI_APP_URL']
+      configloader = CslCli::Config.new(ENV['HOME'])
+      config = configloader.load
+
+      if config != false
+        app_url = config['app_url']
+      else
+        app_url = ENV['CSL_CLI_APP_URL']
+      end
 
       abort 'app_url missing, please check environment variables' if app_url.nil?
 
