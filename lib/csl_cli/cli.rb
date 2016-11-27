@@ -9,6 +9,16 @@ module CslCli
 
     desc 'login', 'Log in at csl app using environmet variables (csl_cli_email, csl_cli_password, csl_cli_app_url)'
     def login
+      configloader = CslCli::Config.new(ENV['HOME'])
+      config = configloader.load
+
+      if config != false
+        puts "Loaded config from .csv_config"
+        email = config['email']
+        password = config['password']
+        app_url = config['app_url']
+      end
+
       email = ENV['CSL_CLI_EMAIL']
       password = ENV['CSL_CLI_PASSWORD']
       app_url = ENV['CSL_CLI_APP_URL']
