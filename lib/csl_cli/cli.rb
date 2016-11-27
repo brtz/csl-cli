@@ -30,6 +30,13 @@ module CslCli
 
     end
 
+    desc 'logout', 'removes the token from disk'
+    def logout
+      tokenstore = CslCli::Tokenstore.new(ENV['HOME'])
+      tokenstore.clear
+      puts "Successfully logged out (removed token from disk)"
+    end
+
     desc 'switch NOTE', 'creates a context switch with NOTE'
     def switch(note)
       token = nil
