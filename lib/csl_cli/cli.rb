@@ -1,5 +1,6 @@
-require 'thor'
 require 'csl_cli'
+require 'thor'
+require 'table_print'
 require 'json'
 require 'base64'
 
@@ -56,6 +57,49 @@ module CslCli
         puts "Successfully created new context switch: #{response['created_at']}: #{response['id']}: #{response['note']}"
       else
         abort "Failed to create new note: #{request.response}"
+      end
+    end
+
+    desc 'list', 'lists your context switches'
+    option :show_all, type: :boolean, aliases: '-s'
+    option :format, type: :string, aliases: '-f'
+    def list
+      token = nil
+      decoded_token = {}
+      query = ""
+
+      app_url = ENV['CSL_CLI_APP_URL']
+
+      abort 'app_url missing, please check environment variables' if app_url.nil?
+
+      begin
+        tokenstore = CslCli::Tokenstore.new(ENV['HOME'])
+        token = tokenstore.load
+      rescue
+        abort 'Failed loading token from disk. Are you logged in?'
+      end
+
+      decoded_token['header'] = JSON.parse(Base64.decode64(token.split('.')[0]))
+      decoded_token['payload'] = JSON.parse(Base64.decode64(token.split('.')[1]))
+
+      query = "?limited=true" unless options[:show_all]
+
+      headers = {"Content-Type" => "application/json", "Authorization" => "Bearer #{token}", "Accept" => "application/json"}
+      request = CslCli::Request::Get.new(app_url + "/switches/" + query, headers)
+      if request.code < 400
+        response = request.response
+        if options[:format] == 'csv'
+          tp.set :separator, ","
+          tp.set :max_width, 100000
+        end
+
+        if options[:show_all]
+          tp response, :except => [:updated_at, :url, :id]
+        else
+          tp response, :except => [:updated_at, :url, :id, :user_id]
+        end
+      else
+        abort "Failed to list notes: #{request.response}"
       end
     end
 
