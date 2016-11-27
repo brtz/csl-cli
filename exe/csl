@@ -1,0 +1,4 @@
+#!/usr/bin/env ruby
+
+require 'csl_cli/cli'
+CslCli::CLI.start
